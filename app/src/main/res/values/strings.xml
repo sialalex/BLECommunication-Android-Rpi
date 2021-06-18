@@ -14,7 +14,7 @@
   limitations under the License.
 -->
 <resources>
-    <string name="app_name">BLE Peripheral Simulator</string>
+    <string name="app_name">BLE Communicationr</string>
     <string name="title_activity_peripherals">Peripherals</string>
     <string name="title_activity_peripheral">Peripheral</string>
     <string name="notify">Notify</string>

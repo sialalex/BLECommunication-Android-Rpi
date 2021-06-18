@@ -22,6 +22,9 @@ android {
         // if true, stop the gradle build if errors are found
         abortOnError false
     }
+    aaptOptions{
+        cruncherEnabled = false
+    }
 }
 
 dependencies {
