@@ -29,10 +29,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -57,6 +59,16 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
             .fromString("71ced1ac-0005-44f5-9454-806ff70b3e02");
     private static final String CHARACT_TURNDISTANCE_DESC = "Turn-Distance";
 
+    //Turn-Info Characateristic & Descriptor
+    private static final UUID CHARACT_TURNINFO_UUID = UUID
+            .fromString("71ced1ac-0006-44f5-9454-806ff70b3e02");
+    private static final String CHARACT_TURNINFO_DESC = "Turn-Info";
+
+    //Turn-Road Characateristic & Descriptor
+    private static final UUID CHARACT_TURNROAD_UUID = UUID
+            .fromString("71ced1ac-0007-44f5-9454-806ff70b3e02");
+    private static final String CHARACT_TURNROAD_DESC = "Turn-Road";
+
     //Service Delegate
     private ServiceFragmentDelegate mDelegate;
 
@@ -70,11 +82,16 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
     private BluetoothGattCharacteristic navStateCharacteristic;
     private BluetoothGattCharacteristic turnIconCharacteristic;
     private BluetoothGattCharacteristic turnDistanceCharacteristic;
+    private BluetoothGattCharacteristic turnInfoCharacteristic;
+    private BluetoothGattCharacteristic turnRoadCharacteristic;
 
     //GATT Characteristics Values
+    byte visibility = 0;
     byte[] navStateCharacteristic_value = new byte[32];
     byte[] turnIconCharacteristic_value = new byte[32];
     byte[] turnDistanceCharacteristic_value = new byte[32];
+    byte[] turnInfoCharacteristic_value = new byte[48];
+    byte[] turnRoadCharacteristic_value = new byte[64];
 
     private final OnClickListener mNotifyButtonListener = new OnClickListener() {
         @Override
@@ -82,6 +99,8 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
             mDelegate.sendNotificationToDevices(navStateCharacteristic);
             mDelegate.sendNotificationToDevices(turnIconCharacteristic);
             mDelegate.sendNotificationToDevices(turnDistanceCharacteristic);
+            mDelegate.sendNotificationToDevices(turnInfoCharacteristic);
+            mDelegate.sendNotificationToDevices(turnRoadCharacteristic);
         }
     };
 
@@ -101,6 +120,14 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
         //Setup and add the turn-icon characteristic
         setupTurnDistanceCharacteristic();
         tbtNavigationService.addCharacteristic(turnDistanceCharacteristic);
+
+        //Setup and add the turn-info characteristic
+        setupTurnInfoCharacteristic();
+        tbtNavigationService.addCharacteristic(turnInfoCharacteristic);
+
+        //Setup and add the turn-road characteristic
+        setupTurnRoadCharacteristic();
+        tbtNavigationService.addCharacteristic(turnRoadCharacteristic);
 
     }
 
@@ -150,6 +177,38 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
                 Peripheral.getCharacteristicUserDescriptionDescriptor(CHARACT_TURNDISTANCE_DESC));
 
         turnDistanceCharacteristic.setValue(turnDistanceCharacteristic_value);
+    }
+
+    //Setup the Turn Distance Characteristic
+    private void setupTurnInfoCharacteristic() {
+        turnInfoCharacteristic =
+                new BluetoothGattCharacteristic(CHARACT_TURNINFO_UUID,
+                        BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                        BluetoothGattCharacteristic.PERMISSION_READ | BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        turnInfoCharacteristic.addDescriptor(
+                Peripheral.getClientCharacteristicConfigurationDescriptor());
+
+        turnInfoCharacteristic.addDescriptor(
+                Peripheral.getCharacteristicUserDescriptionDescriptor(CHARACT_TURNINFO_DESC));
+
+        turnInfoCharacteristic.setValue(turnInfoCharacteristic_value);
+    }
+
+    //Setup the Turn Distance Characteristic
+    private void setupTurnRoadCharacteristic() {
+        turnRoadCharacteristic =
+                new BluetoothGattCharacteristic(CHARACT_TURNROAD_UUID,
+                        BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                        BluetoothGattCharacteristic.PERMISSION_READ | BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        turnRoadCharacteristic.addDescriptor(
+                Peripheral.getClientCharacteristicConfigurationDescriptor());
+
+        turnRoadCharacteristic.addDescriptor(
+                Peripheral.getCharacteristicUserDescriptionDescriptor(CHARACT_TURNROAD_DESC));
+
+        turnRoadCharacteristic.setValue(turnRoadCharacteristic_value);
     }
 
     // Lifecycle callbacks
@@ -240,8 +299,8 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
 
     private void updateTbtNavigationService() {
         updateNavStateCharacteristic();
-
-
+        updateTurnIconCharacteristic();
+        updateTurnDistanceCharacteristic();
     }
 
     private void updateNavStateCharacteristic() {
@@ -272,6 +331,49 @@ public class TBTNavigationServiceFragment extends ServiceFragment {
         for(int i = 0; i < navStateCharacteristic_value.length; i++){
             Log.i("Byte", i + ": " + navStateCharacteristic_value[i]);
         }
+    }
+
+    private void updateTurnIconCharacteristic(){
+        //Convert the entered number to hex
+        String editTextValue = ((EditText) view.findViewById(R.id.turnIconEditText)).getText().toString();
+        String turnIcon = "";
+        try{
+            turnIcon = Integer.toHexString(Integer.parseInt(editTextValue));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        //Set visibility and the turnIcon
+        turnIconCharacteristic_value[16] = visibility;
+        turnIconCharacteristic_value[17] = Byte.parseByte(turnIcon);
+        turnIconCharacteristic.setValue(turnIconCharacteristic_value);
+    }
+
+    private void updateTurnDistanceCharacteristic(){
+        //Get the value of the edit-text and convert it to a byte array
+        String editTextValue = ((EditText) view.findViewById(R.id.turnDistanceEditText)).getText().toString();
+        byte[] turnDistance = editTextValue.getBytes();
+
+        //Check if the entered distance is too long or too short -> modify it
+        if(turnDistance.length > 8){
+            turnDistance = Arrays.copyOfRange(turnDistance, 0, 7);
+        }
+        if(turnDistance.length < 8){
+            for(int i = turnDistance.length; i < 8; i++){
+                turnDistance[i] = 0;
+            }
+        }
+
+        //Fill the characteristic array with the 8 bytes (from 17 to 24)
+        int i1 = 0;
+        for(int i2 = 17; i2 == 24; i2++){
+            turnIconCharacteristic_value[i2] = turnDistance[i1];
+            i1++;
+        }
+
+        //Set the visibility (byte 17) and set the value
+        turnDistanceCharacteristic_value[16] = visibility;
+        turnIconCharacteristic.setValue(turnDistanceCharacteristic_value);
     }
 
 }

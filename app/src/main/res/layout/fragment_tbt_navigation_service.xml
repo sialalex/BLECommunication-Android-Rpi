@@ -22,7 +22,8 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:layout_margin="10sp">
 
         <TextView
             android:id="@+id/textView_serviceName"
@@ -36,35 +37,52 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/textView_serviceName"
-            android:text="Navigation (on/off)"
+            android:text="@string/string_string_navigation_on_off"
             android:id="@+id/navigationStateSwitch"/>
 
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/navigationStateSwitch"
-            android:text="GPS Icon"
+            android:text="@string/gps_icon"
             android:id="@+id/gpsIconSwitch"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/gpsIconSwitch"
-            android:hint="Turn Icon"
-            android:id="@+id/turnIconEditText"/>
+            android:hint="@string/turn_icon"
+            android:id="@+id/turnIconEditText"
+            android:inputType="number"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/turnIconEditText"
-            android:hint="Turn Distance"
-            android:id="@+id/turnDistanceEditText"/>
+            android:hint="@string/turn_distance"
+            android:id="@+id/turnDistanceEditText"
+            android:inputType="text"/>
 
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/turnDistanceEditText"
+            android:hint="@string/turn_info"
+            android:id="@+id/turnInfoEditText"
+            android:inputType="text"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/turnInfoEditText"
+            android:hint="@string/string_turn_road"
+            android:id="@+id/turnRoadEditText"
+            android:inputType="text"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Update Service Characteristics"
+            android:text="@string/update_service_characteristics"
             android:layout_alignParentBottom="true"
             android:id="@+id/updateServiceBtn"/>
 

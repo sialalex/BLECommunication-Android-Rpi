@@ -68,4 +68,14 @@
         discoverable.
     </string>
     <string name="menu_disconnect_devices">Disconnect Devices</string>
+    <string name="gps_icon">GPS Icon</string>
+    <string name="navigation_on_off">Navigation (on/off)</string>
+    <string name="string_navigation_on_off" />
+    <string name="string_string_navigation_on_off" />
+    <string name="turn_icon">Turn Icon</string>
+    <string name="turn_distance">Turn Distance</string>
+    <string name="turn_info">Turn Info</string>
+    <string name="turn_road">Turn Road</string>
+    <string name="string_turn_road" />
+    <string name="update_service_characteristics">Update Service Characteristics</string>
 </resources>
