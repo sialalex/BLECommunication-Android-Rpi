@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/textView_serviceName"
-            android:text="@string/string_string_navigation_on_off"
+            android:text="@string/navigation_on_off"
             android:id="@+id/navigationStateSwitch"/>
 
         <Switch
@@ -53,7 +53,9 @@
             android:layout_below="@id/gpsIconSwitch"
             android:hint="@string/turn_icon"
             android:id="@+id/turnIconEditText"
-            android:inputType="number"/>
+            android:inputType="number"
+
+            android:text="21"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -61,7 +63,9 @@
             android:layout_below="@id/turnIconEditText"
             android:hint="@string/turn_distance"
             android:id="@+id/turnDistanceEditText"
-            android:inputType="text"/>
+            android:inputType="text"
+
+            android:text="12 km"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -69,15 +73,73 @@
             android:layout_below="@id/turnDistanceEditText"
             android:hint="@string/turn_info"
             android:id="@+id/turnInfoEditText"
-            android:inputType="text"/>
+            android:inputType="text"
+
+            android:text="1. Ausfahrt"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/turnInfoEditText"
-            android:hint="@string/string_turn_road"
+            android:hint="@string/turn_road"
             android:id="@+id/turnRoadEditText"
-            android:inputType="text"/>
+            android:inputType="text"
+
+            android:text="Krenastraße"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/turnRoadEditText"
+            android:hint="@string/est_arrival_time"
+            android:id="@+id/estArrivalTimeEditText"
+            android:inputType="text"
+
+            android:text="12:32 am"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/estArrivalTimeEditText"
+            android:hint="@string/distance_to_destination"
+            android:id="@+id/dist2DestEditText"
+            android:inputType="text"
+
+            android:text="150,5 km"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dist2DestEditText"
+            android:id="@+id/notificationLayout"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/distance_to_destination"
+                android:id="@+id/notificationEditText"
+                android:inputType="text"
+                android:layout_weight="1"
+
+                android:text="recalculating"/>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/notificationSpinner"
+                android:entries="@array/notification_icons"/>
+
+        </LinearLayout>
+
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/navigationCommandSpinner"
+            android:layout_below="@id/notificationLayout"
+            android:entries="@array/navigation_commands"></Spinner>
 
         <Button
             android:layout_width="match_parent"
@@ -87,4 +149,5 @@
             android:id="@+id/updateServiceBtn"/>
 
     </RelativeLayout>
+
 </FrameLayout>

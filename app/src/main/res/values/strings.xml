@@ -76,6 +76,23 @@
     <string name="turn_distance">Turn Distance</string>
     <string name="turn_info">Turn Info</string>
     <string name="turn_road">Turn Road</string>
-    <string name="string_turn_road" />
     <string name="update_service_characteristics">Update Service Characteristics</string>
+    <string name="distance_to_destination">Distance to Destination</string>
+    <string name="est_arrival_time">Estimated Arrival Time</string>
+
+    <string-array name="navigation_commands">
+        <item>"none"</item>
+        <item>"Start Navigation"</item>
+        <item>"Stop Navigation"</item>
+        <item>"Skip Waypoint"</item>
+        <item>"Volume Up"</item>
+        <item>"Volume Down"</item>
+        <item>"Mute"</item>
+        <item>"Unmute"</item>
+    </string-array>
+
+    <string-array name="notification_icons">
+        <item>"Rerouting"</item>
+        <item>"Waypoint"</item>
+    </string-array>
 </resources>
