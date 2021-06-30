@@ -271,6 +271,11 @@ public class Peripheral extends Activity implements ServiceFragmentDelegate {
                 mCurrentServiceFragment = new RemoteControlServiceFragment();
             } else if (peripheralIndex == 4) {
                 mCurrentServiceFragment = new TBTNavigationServiceFragment();
+            } else if (peripheralIndex == 5) {
+                Log.i("Client", "Here will the Client be started...");
+                Intent tbtNavigationClientIntent = new Intent(this, TBTNavigationClientActivity.class);
+                startActivity(tbtNavigationClientIntent);
+              return;
             } else {
                 Log.wtf(TAG, "Service doesn't exist");
             }
@@ -351,6 +356,13 @@ public class Peripheral extends Activity implements ServiceFragmentDelegate {
     protected void onStart() {
         super.onStart();
         resetStatusViews();
+
+        //Check if client is selected - if it is selected return
+        int peripheralIndex = getIntent().getIntExtra(Peripherals.EXTRA_PERIPHERAL_INDEX,
+                /* default */ -1);
+        if(peripheralIndex == 5) return;
+
+
         // If the user disabled Bluetooth when the app was in the background,
         // openGattServer() will return null.
         mGattServer = mBluetoothManager.openGattServer(this, mGattServerCallback);
