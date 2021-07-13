@@ -1,11 +1,13 @@
 package com.ktm.sialaa.blecommunication;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -14,21 +16,27 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
 
 public class TBTNavigationClientActivity extends Activity {
     //GUI Elements
     TextView stateTextView;
     TextView servicesTextView;
-
+    Button writeRCMSCharacteristicButton;
+    Button writeTBTNavCharateristicButton;
 
     //Bluetooth LE Elements
     private BluetoothDevice bluetoothDevice;
@@ -36,8 +44,12 @@ public class TBTNavigationClientActivity extends Activity {
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
+
+    private BluetoothGatt bleGatt;
+
     //Handles the events of the LE-Scanner
     private ScanCallback scanCallback = new ScanCallback() {
+        @TargetApi(Build.VERSION_CODES.M)
         @Override
         //The first device which is found (with the specific service) is used
         public void onScanResult(int callbackType, ScanResult result) {
@@ -51,7 +63,8 @@ public class TBTNavigationClientActivity extends Activity {
 
             //Stop the scan and connect with the device
             bluetoothLeScanner.stopScan(scanCallback);
-            BluetoothGatt gatt = bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback);
+            bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback);
+            // bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
         }
 
         //This message will be showed when no device is found
@@ -84,9 +97,42 @@ public class TBTNavigationClientActivity extends Activity {
             //When services were found, they get printed out for the user
             printServices(gatt);
 
-            writeRCMSCharacteristic(gatt);
+            //Enable button and select the Gatt-Object
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    writeRCMSCharacteristicButton.setEnabled(true);
+                    writeTBTNavCharateristicButton.setEnabled(true);
+                }
+            });
+
+            bleGatt = gatt;
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicRead(gatt, characteristic, status);
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicWrite(gatt, characteristic, status);
+        }
+
+        @Override
+        public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorRead(gatt, descriptor, status);
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorWrite(gatt, descriptor, status);
         }
     };
+
+    //Queue for writing the Characteristics
+    private Queue writeQueueCharacteristics = new LinkedList();
+    private boolean isWritingCharacteristics = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +155,26 @@ public class TBTNavigationClientActivity extends Activity {
 
        //TextView for the services
         servicesTextView = findViewById(R.id.servicesTextView);
+
+        //Button for sending data
+        writeRCMSCharacteristicButton = findViewById(R.id.writeRCMSCharacteristic);
+        writeRCMSCharacteristicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                writeRCMSCharacteristic();
+            }
+        });
+
+        //Button for sending data
+        writeTBTNavCharateristicButton = findViewById(R.id.writeTBTNavCharacteristic);
+        writeTBTNavCharateristicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                writeTBTNavigationCharacteristic();
+            }
+        });
+
+
 
     }
 
@@ -140,17 +206,25 @@ public class TBTNavigationClientActivity extends Activity {
 
     }
 
-    private void writeRCMSCharacteristic(BluetoothGatt gatt){
+    private void writeRCMSCharacteristic(){
         byte[] newValue = new byte[32];
         for (int i = 0; i < newValue.length; i++) {
             newValue[i] = (byte) i;
         }
 
-        BluetoothGattCharacteristic remoteControlModeService = gatt.getService(UUID.fromString("71ced1ac-0100-44f5-9454-806ff70b3e02")).getCharacteristic(UUID.fromString("71ced1ac-0103-44f5-9454-806ff70b3e02"));
-        remoteControlModeService.setValue(newValue);
-        boolean a = gatt.writeCharacteristic(remoteControlModeService);
+        BluetoothGattCharacteristic remoteControlModeServiceCharacteristic = bleGatt.getService(UUID.fromString("71ced1ac-0100-44f5-9454-806ff70b3e02")).getCharacteristic(UUID.fromString("71ced1ac-0103-44f5-9454-806ff70b3e02"));
+        remoteControlModeServiceCharacteristic.setValue(newValue);
+        boolean success = bleGatt.writeCharacteristic(remoteControlModeServiceCharacteristic);
 
         Log.i("BluetoothLe", "RCMS Characteristic written");
     }
 
+    private void writeTBTNavigationCharacteristic(){
+        BluetoothGattCharacteristic tbtNavigationServiceCharacteristic = bleGatt.getService(UUID.fromString("71ced1ac-0000-44f5-9454-806ff70b3e02")).getCharacteristic(UUID.fromString("71ced1ac-0004-44f5-9454-806ff70b3e02"));
+        tbtNavigationServiceCharacteristic.setValue("Test Data");
+        boolean success = bleGatt.writeCharacteristic(tbtNavigationServiceCharacteristic);
+
+
+        Log.i("BluetoothLe", "TBTNav Characteristic written");
+    }
 }

@@ -18,6 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/tbtNavigationClientLayout"
     android:layout_margin="10dp"
     tools:context="com.ktm.sialaa.blecommunication.TBTNavigationClientActivity">
 
@@ -44,6 +45,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/stateTextView" />
+
+
+    <Button
+        android:id="@+id/writeRCMSCharacteristic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Write RCMS Characteristic"
+        android:layout_alignParentBottom="true"
+        android:enabled="false"/>
+
+    <Button
+        android:id="@+id/writeTBTNavCharacteristic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Write TBTNav Characteristic"
+        android:layout_above="@id/writeRCMSCharacteristic"
+        android:enabled="false"/>
 
 
 </RelativeLayout>
