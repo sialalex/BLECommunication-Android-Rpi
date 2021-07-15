@@ -15,7 +15,10 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
@@ -63,8 +66,16 @@ public class TBTNavigationClientActivity extends Activity {
 
             //Stop the scan and connect with the device
             bluetoothLeScanner.stopScan(scanCallback);
-            bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback);
-            // bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
+
+            //Doesn't work, problems with bonding and connecting
+            //bondAndConnectDevice();
+
+            //Works, when only this method is used (no bondDevice)
+            connectDevice();
+
+            //Works, when only this method is used (no connectDevice)
+            //bondDevice();
+
         }
 
         //This message will be showed when no device is found
@@ -130,9 +141,6 @@ public class TBTNavigationClientActivity extends Activity {
         }
     };
 
-    //Queue for writing the Characteristics
-    private Queue writeQueueCharacteristics = new LinkedList();
-    private boolean isWritingCharacteristics = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,8 +182,34 @@ public class TBTNavigationClientActivity extends Activity {
             }
         });
 
+    }
 
+    //Doesn't work, problems with bonding and connecting
+    private void bondAndConnectDevice(){
+        if(bluetoothDevice.getBondState() == BluetoothDevice.BOND_BONDED){
+                bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback);
+            }else{
+                if(bluetoothDevice.createBond()){
+                    Log.i("BluetoothLE", "Bonded");
+                    bluetoothDevice.connectGatt(getApplicationContext(), true, bluetoothGattCallback);
+                }else{
+                    Log.i("BluetoothLE", "Not Bonded");
+                }
+            }
+    }
 
+    //Works, when only this method is used (no bondDevice)
+    private void connectDevice(){
+        bluetoothDevice.connectGatt(getApplicationContext(), false, bluetoothGattCallback);
+    }
+
+    //Works, when only this method is used (no connectDevice)
+    private void bondDevice(){
+        if(bluetoothDevice.createBond()){
+            Log.i("BluetoothLE", "Bonded");
+        }else{
+            Log.i("BluetoothLE", "Not Bonded");
+        }
     }
 
     private void startBLEScan(){
